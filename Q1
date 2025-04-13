@@ -1,0 +1,144 @@
+#include <iostream>
+#include <string>
+using namespace std;
+const int MAX_TRANSACTIONS = 100;
+
+class Account {
+protected:
+    string accountNumber;
+    double balance;
+    string accountHolderName;
+    string accountType;
+    string transactionHistory[MAX_TRANSACTIONS];
+    int transactionCount;
+public:
+    Account(string accNum, string holder, double initialBalance, string accType = "General") {
+        accountNumber = accNum;
+        accountHolderName = holder;
+        balance = initialBalance;
+        accountType = accType;
+        transactionCount = 0;
+    }
+    virtual void deposit(double amount) {
+        balance += amount;
+        if (transactionCount < MAX_TRANSACTIONS)
+            transactionHistory[transactionCount++] = "Deposited: " + to_string((int)amount);
+    }
+    virtual bool withdraw(double amount) {
+        if (amount > balance) {
+            cout << "Insufficient balance.\n";
+            return false;
+        }
+        balance -= amount;
+        if (transactionCount < MAX_TRANSACTIONS)
+            transactionHistory[transactionCount++] = "Withdrew: " + to_string((int)amount);
+        return true;
+    }
+    virtual double calculateInterest() const {
+        return 0.0;
+    }
+    virtual void printStatement() const {
+        cout << "Statement for:  " << accountHolderName<<"\n";
+        for (int i = 0; i < transactionCount; i++) {
+            cout << transactionHistory[i] << endl;
+        }
+        cout << "Balance: " << (int)balance << endl;
+    }
+    virtual void getAccountInfo() const {
+        cout << "Account Info:\n";
+        cout << "Holder: " << accountHolderName << endl;
+        cout << "Number: " << accountNumber << endl;
+        cout << "Type: " << accountType << endl;
+        cout << "Balance: " << (int)balance << endl;
+    }
+    virtual ~Account() {}
+};
+
+class SavingsAccount : public Account {
+private:
+    double interestRate;
+    double minimumBalance;
+public:
+    SavingsAccount(string accNum, string holder, double initialBalance, double rate, double minBalance)
+        : Account(accNum, holder, initialBalance, "Savings") {
+        interestRate = rate;
+        minimumBalance = minBalance;
+    }
+    double calculateInterest() const override {
+        return balance * interestRate;
+    }
+    bool withdraw(double amount) override {
+        if (balance - amount < minimumBalance) {
+            cout << "Withdrawal denied: Below minimum balance.\n";
+            return false;
+        }
+        return Account::withdraw(amount);
+    }
+    void printStatement() const override {
+        Account::printStatement();
+        cout << "Interest: " << (int)calculateInterest() << endl;
+    }
+};
+
+class CheckingAccount : public Account {
+private:
+    double overdraftLimit;
+public:
+    CheckingAccount(string accNum, string holder, double initialBalance, double overdraft)
+        : Account(accNum, holder, initialBalance, "Checking") {
+        overdraftLimit = overdraft;
+    }
+    bool withdraw(double amount) override {
+        if (amount > balance + overdraftLimit) {
+            cout << "Overdraft limit exceeded.\n";
+            return false;
+        }
+        balance -= amount;
+        if (transactionCount < MAX_TRANSACTIONS)
+            transactionHistory[transactionCount++] = "Withdrew (OD): $" + to_string((int)amount);
+        return true;
+    }
+};
+
+class FixedDepositAccount : public Account {
+private:
+    double fixedInterestRate;
+    bool matured;
+public:
+    FixedDepositAccount(string accNum, string holder, double initialBalance, double rate, bool isMatured)
+        : Account(accNum, holder, initialBalance, "Fixed Deposit") {
+        fixedInterestRate = rate;
+        matured = isMatured;
+    }
+    double calculateInterest() const override {
+        return matured ? balance * fixedInterestRate : 0.0;
+    }
+    bool withdraw(double amount) override {
+        if (!matured) {
+            cout << "Cannot withdraw: Deposit not matured.\n";
+            return false;
+        }
+        return Account::withdraw(amount);
+    }
+    void printStatement() const override {
+        Account::printStatement();
+        cout << "Fixed Interest: " << (int)calculateInterest() << endl;
+    }
+};
+
+int main() {
+    SavingsAccount savings("SA101", "Ali", 5000, 0.03, 1000);
+    savings.deposit(500);
+    savings.withdraw(1000);
+    savings.printStatement();
+    savings.getAccountInfo();
+    CheckingAccount checking("CA202", "Basim", 2000, 500);
+    checking.withdraw(2300);
+    checking.printStatement();
+    checking.getAccountInfo();
+    FixedDepositAccount fixed("FD303", "Areeba", 10000, 0.05, false); // not matured
+    fixed.withdraw(1000); 
+    fixed.printStatement();
+    fixed.getAccountInfo();
+    return 0;
+}
