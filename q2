@@ -1,0 +1,120 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Shape {
+protected:
+    int x, y;
+    string color;
+    int borderThickness;
+public:
+    Shape(int px, int py, string c, int border = 1) {
+        x = px;
+        y = py;
+        color = c;
+        borderThickness = border;
+    }
+    virtual void draw() const {
+        cout << "Drawing shape at (" << x << ", " << y << ") with color " << color << " and border " << borderThickness << "\n";
+    }
+    virtual double calculateArea() const = 0;
+    virtual double calculatePerimeter() const = 0;
+    virtual ~Shape() {}
+};
+
+class Circle : public Shape {
+private:
+    double radius;
+public:
+    Circle(int cx, int cy, string c, double r, int border = 1)
+        : Shape(cx, cy, c, border) {
+        radius = r;
+    }
+    void draw() const override {
+        cout << "Drawing Circle at (" << x << ", " << y << ") with radius " << radius << ", color " << color << "\n";
+    }
+    double calculateArea() const override {
+        return 3.14 * radius * radius;
+    }
+    double calculatePerimeter() const override {
+        return 2 * 3.14 * radius;
+    }
+};
+
+class Rectangle : public Shape {
+private:
+    double width, height;
+public:
+    Rectangle(int topLeftX, int topLeftY, string c, double w, double h, int border = 1)
+        : Shape(topLeftX, topLeftY, c, border) {
+        width = w;
+        height = h;
+    }
+    void draw() const override {
+        cout << "Drawing Rectangle at (" << x << ", " << y << ") width: " << width << ", height: " << height << ", color: " << color << "\n";
+    }
+    double calculateArea() const override {
+        return width * height;
+    }
+    double calculatePerimeter() const override {
+        return 2 * (width + height);
+    }
+};
+
+class Triangle : public Shape {
+private:
+    double base, height;
+public:
+    Triangle(int px, int py, string c, double b, double h, int border = 1)
+        : Shape(px, py, c, border) {
+        base = b;
+        height = h;
+    }
+    void draw() const override {
+        cout << "Drawing Triangle at (" << x << ", " << y << ") with base " << base << " and height " << height << ", color: " << color << "\n";
+    }
+    double calculateArea() const override {
+        return 0.5 * base * height;
+    }
+    double calculatePerimeter() const override {
+        return base + height + (base + height) / 2; // simple approximation of hypotenuse
+    }
+};
+class Polygon : public Shape {
+private:
+    int sides;
+    double sideLength;
+public:
+    Polygon(int px, int py, string c, int s, double length, int border = 1)
+        : Shape(px, py, c, border) {
+        sides = s;
+        sideLength = length;
+    }
+    void draw() const override {
+        cout << "Drawing Polygon at (" << x << ", " << y << ") with " << sides << " sides of length " << sideLength << ", color: " << color << "\n";
+    }
+    double calculateArea() const override {
+        if (sides == 4) {
+            return sideLength * sideLength; // square approximation
+        }
+        return 0.0;
+    }
+    double calculatePerimeter() const override {
+        return sides * sideLength;
+    }
+};
+int main() {
+    Circle c(10, 10, "Red", 5);
+    Rectangle r(0, 0, "Blue", 8, 4);
+    Triangle t(5, 5, "Green", 6, 3);
+    Polygon p(3, 3, "Yellow", 4, 5); // Square-like polygon
+    c.draw();
+    cout << "Area: " << c.calculateArea() << ", Perimeter: " << c.calculatePerimeter() << "\n\n";
+    r.draw();
+    cout << "Area: " << r.calculateArea() << ", Perimeter: " << r.calculatePerimeter() << "\n\n";
+    t.draw();
+    cout << "Area: " << t.calculateArea() << ", Perimeter (approx): " << t.calculatePerimeter() << "\n\n";
+    p.draw();
+    cout << "Area (approx): " << p.calculateArea() << ", Perimeter: " << p.calculatePerimeter() << "\n";
+    return 0;
+}
