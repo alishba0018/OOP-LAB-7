@@ -1,0 +1,150 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Person {
+protected:
+    string name;
+    string id;
+    string address;
+    string phoneNumber;
+    string email;
+public:
+    Person(string name = "", string id = "", string address = "", string phone = "", string email = "")
+        : name(name), id(id), address(address), phoneNumber(phone), email(email) {}
+    virtual void displayInfo() {
+        cout << "Name: " << name << "\nID: " << id
+             << "\nAddress: " << address << "\nPhone: " << phoneNumber
+             << "\nEmail: " << email << endl;
+    }
+    void updateInfo(string newAddress, string newPhone, string newEmail) {
+        address = newAddress;
+        phoneNumber = newPhone;
+        email = newEmail;
+    }
+    virtual ~Person() {}
+};
+
+class Student : public Person {
+private:
+    string coursesEnrolled[10];
+    int courseCount;
+    float GPA;
+    int enrollmentYear;
+public:
+    Student(string name, string id, string address, string phone, string email,
+            float gpa, int year)
+        : Person(name, id, address, phone, email), GPA(gpa), enrollmentYear(year), courseCount(0) {}
+    void enrollCourse(const string& course) {
+        if (courseCount < 10) {
+            coursesEnrolled[courseCount++] = course;
+        } else {
+            cout << "Course limit reached for student.\n";
+        }
+    }
+    void displayInfo() override {
+        Person::displayInfo();
+        cout << "Enrollment Year: " << enrollmentYear << "\nGPA: " << GPA << "\nCourses Enrolled:\n";
+        for (int i = 0; i < courseCount; i++) {
+            cout << "- " << coursesEnrolled[i] << endl;
+        }
+    }
+};
+
+class Professor : public Person {
+private:
+    string department;
+    string coursesTaught[5];
+    int courseCount;
+    double salary;
+public:
+    Professor(string name, string id, string address, string phone, string email,
+              string dept, double sal)
+        : Person(name, id, address, phone, email), department(dept), salary(sal), courseCount(0) {}
+    void addCourse(const string& course) {
+        if (courseCount < 5) {
+            coursesTaught[courseCount++] = course;
+        } else {
+            cout << "Course limit reached for professor.\n";
+        }
+    }
+    void displayInfo() override {
+        Person::displayInfo();
+        cout << "Department: " << department << "\nSalary: $" << salary << "\nCourses Taught:\n";
+        for (int i = 0; i < courseCount; i++) {
+            cout << "- " << coursesTaught[i] << endl;
+        }
+    }
+};
+
+class Staff : public Person {
+private:
+    string department;
+    string position;
+    double salary;
+public:
+    Staff(string name, string id, string address, string phone, string email,
+          string dept, string pos, double sal)
+        : Person(name, id, address, phone, email), department(dept), position(pos), salary(sal) {}
+    void displayInfo() override {
+        Person::displayInfo();
+        cout << "Department: " << department << "\nPosition: " << position
+             << "\nSalary: $" << salary << endl;
+    }
+};
+
+class Course {
+private:
+    string courseId;
+    string courseName;
+    int credits;
+    string instructor;
+    string schedule;
+    string registeredStudents[30];
+    int studentCount;
+public:
+    Course(string id = "", string name = "", int cr = 0, string instr = "", string sched = "")
+        : courseId(id), courseName(name), credits(cr), instructor(instr), schedule(sched), studentCount(0) {}
+
+    void registerStudent(const string& studentId) {
+        if (studentCount < 30) {
+            registeredStudents[studentCount++] = studentId;
+        } else {
+            cout << "Course is full, cannot register more students.\n";
+        }
+    }
+    void displayCourse() {
+        cout << "Course ID: " << courseId << "\nCourse Name: " << courseName
+             << "\nCredits: " << credits << "\nInstructor: " << instructor
+             << "\nSchedule: " << schedule << "\nRegistered Students:\n";
+        for (int i = 0; i < studentCount; i++) {
+            cout << "- " << registeredStudents[i] << endl;
+        }
+    }
+    void calculateGrades() {
+        cout << "Grades calculated for " << studentCount << " students in " << courseName << ".\n";
+    }
+};
+
+int main() {
+    Student s1("Aliza Ahmed", "S1001", "123 College Rd", "555-1234", "aliza@nu.edu.pk", 3.8, 2022);
+    s1.enrollCourse("CS101");
+    s1.enrollCourse("MATH201");
+    Professor p1("Dr. Ijlal Rizvi", "P2001", "45 Faculty Ln", "555-5678", "ijlalnu.edu.pk", "Computer Science", 85000);
+    p1.addCourse("CS101");
+    Staff st1("Ayesha Faisal", "ST3001", "10 Admin St", "555-8888", "ayeshanu.edu.pk", "Admissions", "Coordinator", 50000);
+    Course c1("CS101", "Intro to Programming", 4, "Dr. Ijlal Rizvi", "Mon/Wed 10:00-11:30");
+    c1.registerStudent("S1001");
+    c1.registerStudent("S1002"); 
+    cout << "STUDENT INFO\n";
+    s1.displayInfo();
+    cout << "PROFESSOR INFO\n";
+    p1.displayInfo();
+    cout << "STAFF INFO\n";
+    st1.displayInfo();
+    cout << "COURSE INFO\n";
+    c1.displayCourse();
+    cout << "GRADE CALCULATION\n";
+    c1.calculateGrades();
+    return 0;
+}
